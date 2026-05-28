@@ -1,0 +1,89 @@
+
+<!DOCTYPE html><html lang="vi"><head>
+<meta charset="UTF-8"><title>Dashboard | AutoReport Pro Cloud</title><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"><link rel="stylesheet" href="/static/style.css"></head><body>
+<aside class="sidebar"><div class="logo"><div><strong>AutoReport</strong><span>Cloud</span></div><p>AI Report Generator</p></div>
+<nav><a class="active" href="/app">⌂ Dashboard</a><a href="/">🌐 Landing</a><a href="#report-search">⌕ Tìm báo cáo mẫu</a><a href="/history">▣ Lịch sử</a><a href="/pricing">♛ Gói dịch vụ</a><a href="/support">☏ Hỗ trợ</a><a href="/security">🛡 Bảo mật</a><span class="nav-disabled">Google/Facebook: chưa hỗ trợ</span><a href="/logout">⇥ Đăng xuất</a></nav>
+<div class="usage-box"><p>FREE TRIAL HÔM NAY</p><strong>{{ used }}/{{ free_limit }}</strong>{% if subscription %}<span>PRO đang hoạt động</span>{% else %}<span>Còn {{ remaining }} lượt miễn phí</span>{% endif %}<a href="/pricing">Nâng cấp</a></div>
+</aside>
+<main class="main">
+<header class="topbar"><div class="search">⌕ <input id="globalReportSearch" placeholder="Tìm báo cáo mẫu: thực tập, đồ án, doanh thu..."></div><div class="top-actions"><a class="outline-btn" href="/support">Chat Admin AI</a><a class="btn" href="/pricing">Nâng cấp</a></div></header>
+<section class="hero glass-hero"><div><span class="badge">AI REPORT CLOUD</span><p>Xin chào {{ user.name or user.email or "bạn" }} 👋</p><h1>Tạo báo cáo chuyên nghiệp với <span>AI thật</span></h1><h2>Upload dữ liệu hoặc file mẫu có sẵn, AI nhận diện cấu trúc và tạo báo cáo Word/PDF chuyên nghiệp. Hỗ trợ login Google/Facebook, thanh toán tự động và Admin AI.</h2></div><div class="hero-panel"><b>Trạng thái hệ thống</b><p>OAuth: Google/Facebook chưa hỗ trợ</p><p>Payment: {{ payment_provider|upper }}</p><p>Security: CSRF + Rate Limit</p></div></section>
+
+<section class="report-finder" id="report-search">
+  <div class="finder-head">
+    <div>
+      <span class="badge">KHO BÁO CÁO MẪU</span>
+      <h2>Tìm báo cáo tham khảo nhanh</h2>
+      <p>Nhập từ khóa hoặc bấm gợi ý, hệ thống sẽ hiện các mẫu báo cáo đã sưu tầm/sắp xếp sẵn để bạn lấy ý tưởng viết.</p>
+    </div>
+    <div class="finder-search">⌕ <input id="reportSearchInput" placeholder="VD: thực tập, kỹ thuật, doanh thu, phần mềm..."></div>
+  </div>
+  <div class="keyword-chips" id="keywordChips"></div>
+  <div class="report-grid" id="reportGrid"></div>
+</section>
+
+<section class="stats stats-pro"><div class="stat"><strong>{{ recent|length }}</strong><span>Báo cáo gần đây</span><small>Đã lưu</small></div><div class="stat"><strong>{{ used }}/{{ free_limit }}</strong><span>Lượt free</span><small>Hôm nay</small></div><div class="stat"><strong>{% if subscription %}PRO{% else %}FREE{% endif %}</strong><span>Trạng thái</span><small>Tài khoản</small></div><div class="stat"><strong>AI+</strong><span>Nhận diện mẫu</span><small>Gói Pro/Premium</small></div><div class="stat"><strong>SEC</strong><span>Bảo mật</span><small>Upload filter + log</small></div></section>
+{% if not allowed %}<div class="limit-banner"><h3>Bạn đã hết 2 lượt miễn phí hôm nay</h3><p>Nâng cấp để tiếp tục tạo báo cáo.</p><a href="/pricing">Xem gói →</a></div>{% endif %}
+<section class="content">
+<form action="/generate" method="POST" enctype="multipart/form-data" class="creator"><input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+<h3>Tạo báo cáo mới</h3>
+<div class="form-grid">
+<label>Loại báo cáo<select name="report_type"><option>Báo cáo công việc</option><option>Báo cáo kỹ thuật</option><option>Báo cáo doanh thu</option><option>Báo cáo thực tập</option><option>Báo cáo đồ án</option></select></label>
+<label>Tiêu đề<input name="title" required placeholder="Nhập tiêu đề"></label>
+<label>Người lập<input name="author" value="{{ user.name or '' }}"></label>
+<label>Đơn vị<input name="department" placeholder="Công ty / Lớp / Phòng ban"></label>
+<label>Từ ngày<input type="date" name="from_date"></label><label>Đến ngày<input type="date" name="to_date"></label>
+<label>Xuất file<select name="export_format"><option value="docx">Word DOCX</option><option value="pdf">PDF</option></select></label>
+<label>Upload dữ liệu Excel/CSV<input type="file" name="excel_file" accept=".xlsx,.xls,.csv"></label>
+<label class="wide">File mẫu cho AI làm theo <small>Free bị khóa, gói 7 ngày/1 tháng mở tính năng này</small><input type="file" name="template_file" accept=".doc,.docx,.pdf,.ppt,.pptx,.xls,.xlsx,.csv,.txt,.md,.json,.html,.htm,.py,.js,.css"></label>
+</div>
+<label>Mục tiêu<textarea name="goal" rows="3"></textarea></label>
+<label>Nội dung chính<textarea name="tasks" rows="6" placeholder="- Tổng hợp dữ liệu&#10;- Phân tích kết quả"></textarea></label>
+<label>Kết luận<textarea name="conclusion" rows="3"></textarea></label>
+{% if allowed %}<button class="primary" type="submit">Tạo báo cáo →</button>{% else %}<button class="primary" type="button" onclick="location.href='/pricing'">Hết lượt - Nâng cấp</button>{% endif %}
+</form>
+<aside>
+<div class="setting-card"><h3>Logo công ty</h3><form action="/upload-logo" method="POST" enctype="multipart/form-data"><input type="hidden" name="csrf_token" value="{{ csrf_token }}"><input type="file" name="logo" accept=".png,.jpg,.jpeg,.webp"><button class="btn" style="margin-top:10px">Upload logo</button></form>{% if user.company_logo %}<img class="logo-preview" src="{{ user.company_logo }}">{% endif %}</div>
+<div class="ai-card"><h3>Chat Admin AI</h3><p class="small-note">AI trả lời ngay và tạo phiếu chờ xử lý cho admin.</p><a class="btn" href="/support">Mở hỗ trợ</a></div><div class="recent"><h3>Báo cáo gần đây</h3>{% for r in recent %}<div class="item"><b>{{ r.title }}</b><small>{{ r.created_at.strftime('%d/%m/%Y %H:%M') }}</small><em><a href="/download/docx/{{ r.docx_filename }}">DOCX</a></em></div>{% else %}<div class="item"><b>Chưa có báo cáo</b><small>Tạo báo cáo đầu tiên</small></div>{% endfor %}</div>
+</aside>
+</section>
+</main><div class="mobile-bar"><a href="/">Home</a><a href="/app">App</a><a href="/pricing">Gói</a><a href="/support">Hỗ trợ</a></div>
+
+<script>
+const REPORT_LIBRARY = {{ report_library|tojson }};
+const keywordBox = document.getElementById('keywordChips');
+const reportGrid = document.getElementById('reportGrid');
+const input = document.getElementById('reportSearchInput');
+const globalInput = document.getElementById('globalReportSearch');
+const allKeywords = [...new Set(REPORT_LIBRARY.flatMap(r => r.keywords))].sort();
+function fillFormFromReport(r){
+  const title = document.querySelector('input[name="title"]');
+  const goal = document.querySelector('textarea[name="goal"]');
+  const tasks = document.querySelector('textarea[name="tasks"]');
+  if(title) title.value = r.title;
+  if(goal) goal.value = 'Viết ' + r.title.toLowerCase() + ' theo bố cục chuyên nghiệp, rõ ràng, có nhận xét và đề xuất.';
+  if(tasks) tasks.value = '- ' + r.outline.replaceAll(' → ', '\n- ');
+  document.querySelector('.creator')?.scrollIntoView({behavior:'smooth', block:'start'});
+}
+function renderReports(q=''){
+  const query = (q || '').toLowerCase().trim();
+  const list = REPORT_LIBRARY.filter(r => !query || r.title.toLowerCase().includes(query) || r.category.toLowerCase().includes(query) || r.keywords.some(k => k.toLowerCase().includes(query)));
+  reportGrid.innerHTML = list.map((r, i) => `
+    <article class="report-card">
+      <div class="report-meta"><span>${r.category}</span><small>${r.keywords.slice(0,3).join(' • ')}</small></div>
+      <h3>${r.title}</h3>
+      <p>${r.description}</p>
+      <div class="outline"><b>Bố cục:</b> ${r.outline}</div>
+      <button type="button" class="outline-btn" data-idx="${REPORT_LIBRARY.indexOf(r)}">Dùng mẫu này</button>
+    </article>`).join('') || '<div class="empty-report">Chưa tìm thấy mẫu phù hợp. Thử từ khóa khác.</div>';
+  reportGrid.querySelectorAll('button[data-idx]').forEach(btn => btn.onclick = () => fillFormFromReport(REPORT_LIBRARY[btn.dataset.idx]));
+}
+keywordBox.innerHTML = allKeywords.map(k => `<button type="button">${k}</button>`).join('');
+keywordBox.querySelectorAll('button').forEach(btn => btn.onclick = () => { input.value = btn.textContent; renderReports(btn.textContent); });
+[input, globalInput].forEach(el => el && el.addEventListener('input', e => { input.value = e.target.value; renderReports(e.target.value); document.getElementById('report-search').scrollIntoView({behavior:'smooth', block:'start'}); }));
+renderReports();
+</script>
+
+</body></html>

@@ -1,0 +1,29 @@
+services:
+  - type: web
+    name: autoreport-pro-cloud
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DOMAIN_URL
+        value: https://your-domain.com
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: BANK_NAME
+        value: MB Bank
+      - key: BANK_ACCOUNT
+        value: 0123456789
+      - key: BANK_OWNER
+        value: NGUYEN HAI NAM
+      - key: PAYMENT_SECRET
+        generateValue: true
+databases:
+  - name: autoreport-postgres
+    plan: free

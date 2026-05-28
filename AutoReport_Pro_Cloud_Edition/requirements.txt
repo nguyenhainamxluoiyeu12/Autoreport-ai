@@ -1,0 +1,16 @@
+flask
+flask_sqlalchemy
+authlib
+requests
+pandas
+openpyxl
+python-docx
+matplotlib
+reportlab
+openai
+gunicorn
+psycopg2-binary
+pypdf
+python-pptx
+
+python-dotenv
